@@ -1,5 +1,5 @@
 import os
-from api_request import APIRequest
+from .api_request import APIRequest
 
 class LarkAuthenticator(APIRequest):
 

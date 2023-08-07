@@ -1,9 +1,14 @@
 import os
-from api_request import APIRequest
+from .api_request import APIRequest
+from .lark_authenticator import LarkAuthenticator
+from dotenv import load_dotenv,find_dotenv
+
+# Find .env file
+load_dotenv(find_dotenv())
 
 class LarkContactManager(APIRequest):
 
-    def __init__(self, authenticator):
+    def __init__(self, authenticator: LarkAuthenticator):
         self.authenticator = authenticator
     
     def get_lark_user_ids(self, agent_emails):

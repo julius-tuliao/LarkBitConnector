@@ -8,5 +8,5 @@ class TestLarkAuthenticator(unittest.TestCase):
         self.auth = LarkAuthenticator()
 
     def test_get_app_access_token_returns_token(self):
-        token = self.auth.get_app_access_token()
+        token = self.auth.get_tenant_access_token()
         self.assertIsNotNone(token)

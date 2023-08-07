@@ -1,10 +1,15 @@
 import os
-from api_request import APIRequest
+from .api_request import APIRequest
+from .lark_authenticator import LarkAuthenticator
+from datetime import datetime
+from dotenv import load_dotenv,find_dotenv
 
+# Find .env file
+load_dotenv(find_dotenv())
 
 class BitableManager(APIRequest):
     
-    def __init__(self, authenticator):
+    def __init__(self, authenticator: LarkAuthenticator):
         self.bitable_id = os.getenv('BITABLE_ID')
         self.authenticator = authenticator
 
@@ -68,3 +73,9 @@ class BitableManager(APIRequest):
     def _get_user_access_token(self):
         with open(os.getenv('REFRESH_TOKEN_FILE_PATH'), 'r') as file:
             return file.readlines()[1].strip()
+
+    def process_dl_date(self,date_str):
+        if not str(date_str).isalpha():
+            time = datetime.strptime(str(date_str), "%Y-%m-%d")
+            return int((time - datetime(1970, 1, 1)).total_seconds() * 1000)
+        return 1568470400000  # Default date set for null date in CRM
