@@ -2,10 +2,10 @@ import os
 from dotenv import load_dotenv
 
 # Assuming you've separated each class into its module.
-from src.lark_authenticator import LarkAuthenticator
-from src.lark_contact_manager import LarkContactManager
-from src.bitable_manager import BitableManager
-from db.database import Database
+from lark.lark_authenticator import LarkAuthenticator
+from lark.lark_contact_manager import LarkContactManager
+from lark.bitable_manager import BitableManager
+from db.mysql_database import Database
 
 
 load_dotenv()

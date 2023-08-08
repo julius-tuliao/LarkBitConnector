@@ -1,6 +1,6 @@
 # tests/test_lark_authenticator.py
 import unittest
-from src.lark_authenticator import LarkAuthenticator
+from lark.lark_authenticator import LarkAuthenticator
 
 class TestLarkAuthenticator(unittest.TestCase):
 

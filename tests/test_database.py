@@ -1,6 +1,6 @@
 # tests/test_api_request.py
 import unittest
-from db.database import Database
+from db.mysql_database import Database
 
 class TestDatabase(unittest.TestCase):
 

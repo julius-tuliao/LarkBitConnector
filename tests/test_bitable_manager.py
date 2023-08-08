@@ -1,7 +1,7 @@
 # tests/test_bitable_manager.py
 import unittest
-from src.bitable_manager import BitableManager
-from src.lark_authenticator import LarkAuthenticator
+from lark.bitable_manager import BitableManager
+from lark.lark_authenticator import LarkAuthenticator
 
 class TestBitableManager(unittest.TestCase):
 

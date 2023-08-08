@@ -1,7 +1,7 @@
 # tests/test_api_request.py
 import unittest
-from src.api_request import APIRequest
-from src.lark_authenticator import LarkAuthenticator
+from lark.api_request import APIRequest
+from lark.lark_authenticator import LarkAuthenticator
 
 class TestAPIRequest(unittest.TestCase):
 
