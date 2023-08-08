@@ -1,9 +1,14 @@
 from sqlalchemy import create_engine, exc, text
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv,find_dotenv
+import os
+
+# Find .env file
+load_dotenv(find_dotenv())
 
 class Database:
-    def __init__(self, user, password, host, database):
-        self.user = user
+    def __init__(self, user = os.getenv('DB_USER'), password = os.getenv('DB_PASSWORD'), host= os.getenv('DB_HOST'), database= os.getenv('DB_DATABASE')):
+        self.user =  user
         self.password = password
         self.host = host
         self.database = database

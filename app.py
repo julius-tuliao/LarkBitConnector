@@ -35,7 +35,7 @@ def main():
     response = bitable_manager.add_rows_to_bitable(table_id, new_record)
     print("Added Record Response:", response)
 
-    db = Database(user="username", password="password", host="localhost", database="mydb")
+    db = Database()
     if db.connect():
         # SELECT Query example
         users = db.execute_select("SELECT * FROM users WHERE name = :name", {"name": "John Doe"})
