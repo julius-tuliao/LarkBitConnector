@@ -9,7 +9,7 @@ class TestDatabase(unittest.TestCase):
         
 
 
-    def test_unsupported_method_raises_exception(self):
+    def test_database_connect_select(self):
         
         if self.database.connect():
         # SELECT Query example
