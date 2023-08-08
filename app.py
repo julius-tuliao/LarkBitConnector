@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from src.lark_authenticator import LarkAuthenticator
 from src.lark_contact_manager import LarkContactManager
 from src.bitable_manager import BitableManager
+from db.database import Database
+
 
 load_dotenv()
 
@@ -32,6 +34,17 @@ def main():
     }
     response = bitable_manager.add_rows_to_bitable(table_id, new_record)
     print("Added Record Response:", response)
+
+    db = Database(user="username", password="password", host="localhost", database="mydb")
+    if db.connect():
+        # SELECT Query example
+        users = db.execute_select("SELECT * FROM users WHERE name = :name", {"name": "John Doe"})
+        for user in users:
+            print(user)
+
+        # INSERT Query example
+        db.execute_insert("users", {"name": "Jane Doe", "email": "jane@example.com"})
+
 
 if __name__ == "__main__":
     main()
