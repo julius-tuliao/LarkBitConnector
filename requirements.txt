@@ -1,0 +1,4 @@
+requests==2.25.1
+python-dotenv==0.15.0
+sqlalchemy==1.4.22  # You can change this version to whatever is latest or suitable for your needs
+
