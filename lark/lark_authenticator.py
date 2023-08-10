@@ -1,12 +1,18 @@
 import os
 from .api_request import APIRequest
+from dotenv import load_dotenv,find_dotenv
+
+# Find .env file
+load_dotenv(find_dotenv())
 
 class LarkAuthenticator(APIRequest):
 
     def __init__(self):
         self.app_id = os.getenv('APP_ID')
         self.app_secret = os.getenv('APP_SECRET')
+        self.token_location = os.getenv('REFRESH_TOKEN_FILE_PATH')
         self.tenant_access_token = self.get_tenant_access_token()
+
 
     def get_tenant_access_token(self):
         payload = {"app_id": self.app_id, "app_secret": self.app_secret}
@@ -14,7 +20,10 @@ class LarkAuthenticator(APIRequest):
         response = self.send_request('POST', os.getenv('TENANT_ACCESS_TOKEN_URL'), headers, payload)
         return response.get('tenant_access_token', None)
 
-    def refresh_user_access_token(self, location):
+    def refresh_user_access_token(self):
+
+        location = self.token_location
+
         try:
             with open(location, 'r') as file:
                 refresh_token = file.readline().strip()

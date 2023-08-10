@@ -33,7 +33,7 @@ class BitableManager(APIRequest):
         payload = {"fields": row}
         return self.send_request('POST', url, headers, payload)
 
-    def get_records(self, table_id, page_size=500):
+    def get_records(self, table_id, page_size=500, filter=None):
         access_token = self._get_user_access_token()
         page_token = None
         has_more = True
@@ -41,7 +41,11 @@ class BitableManager(APIRequest):
         headers = {'Authorization': 'Bearer ' + access_token}
 
         while has_more:
-            url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records?page_size={page_size}"
+            base_url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records"
+            filter_str = f"&filter={filter}" if filter else ""
+            
+            url = f"{base_url}?page_size={page_size}{filter_str}"
+            
             if page_token:
                 url += f"&page_token={page_token}"
             response = self.send_request('GET', url, headers)
