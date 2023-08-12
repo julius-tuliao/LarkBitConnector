@@ -18,7 +18,7 @@ from lark.bitable_manager import BitableManager
 from db.mysql_database import Database
 from utilities.download_manager import DownloadManager
 from utilities.file_manager import FileManager
-
+from utilities.backup_manager import BackupManager
 
 load_dotenv()
 
@@ -29,21 +29,24 @@ def main():
 
     # 2. Retrieve records from a Bitable table.
     bitable_manager = BitableManager(lark_auth)
-    table_id = ""
+    table_id = "tblctx7p1jfSgmyT"
     records = bitable_manager.get_records(table_id,filter="CurrentValue.[Downloaded]!=%22Done%22")
 
 
     # 3. Download and update
     download_manager = DownloadManager()
     file_manager = FileManager()
-
+    backup_manager = BackupManager()
     user_access_token = lark_auth.refresh_user_access_token()
 
 
     for record in records:
+        
         if "Downloaded" not in record["fields"] or record["fields"]["Downloaded"] != "Done":
             headers = {'Authorization': 'Bearer ' + user_access_token}
 
+            backup_manager.add_record(record)
+            backup_manager.save_to_file()
         # Handle Transmittal Pic
         if "Transmittal Pic" in record["fields"]:
             transmittal = record["fields"]["Transmittal Pic"][0]
@@ -56,8 +59,9 @@ def main():
                 path = file_manager.save_file('images', f'T~{reference_code}~{file_name}', downloaded_content)
                 
                 if file_manager.file_size_is_valid(path):
-                    updated_fields = {"Downloaded": "", "Transmittal Pic": {"attachment": [{"file_token": "DRiFbwaKsoZaLax4WKZbEGCccoe"}]}}
+                    updated_fields = {"Downloaded": "Done"}
                     response = bitable_manager.update_rows_in_bitable(table_id, record["record_id"], updated_fields)
+                    
                     print(response)
                 else:
                     file_manager.delete_file(path)
@@ -68,7 +72,7 @@ def main():
             link = house["url"]
             file_name = house["name"]
             reference_code = record["fields"]["reference_code"]
-            updated_fields = {"Downloaded": "", "Pictures": {"attachment": [{"file_token": "DRiFbwaKsoZaLax4WKZbEGCccoe"}]}}
+            updated_fields = {"Downloaded": "Done"}
 
             downloaded_content = download_manager.download_with_retry(link, headers)
             if downloaded_content:

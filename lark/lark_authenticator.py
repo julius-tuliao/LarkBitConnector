@@ -1,9 +1,13 @@
 import os
 from .api_request import APIRequest
 from dotenv import load_dotenv,find_dotenv
-
+import time
+from utilities.retry_decorator import Decorator
 # Find .env file
 load_dotenv(find_dotenv())
+
+
+retry = Decorator()
 
 class LarkAuthenticator(APIRequest):
 
@@ -12,14 +16,16 @@ class LarkAuthenticator(APIRequest):
         self.app_secret = os.getenv('APP_SECRET')
         self.token_location = os.getenv('REFRESH_TOKEN_FILE_PATH')
         self.tenant_access_token = self.get_tenant_access_token()
+       
 
-
+    @retry.retry_on_none
     def get_tenant_access_token(self):
         payload = {"app_id": self.app_id, "app_secret": self.app_secret}
         headers = {'Content-Type': 'application/json'}
         response = self.send_request('POST', os.getenv('TENANT_ACCESS_TOKEN_URL'), headers, payload)
         return response.get('tenant_access_token', None)
 
+    @retry.retry_on_none
     def refresh_user_access_token(self):
 
         location = self.token_location

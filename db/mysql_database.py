@@ -53,3 +53,22 @@ class Database:
             print(f"Error executing INSERT query: {e}")
         finally:
             session.close()
+
+    def execute_select_with_column_name(self, query, params=None):
+        """Execute a SELECT SQL query and return both rows and column names."""
+        if not self.Session:
+            raise Exception("Database connection is not established. Call connect() first.")
+        
+        session = self.Session()
+        try:
+            result = session.execute(text(query), params)
+            # Get the column names using keys() method
+            column_names = result.keys()
+            rows = result.fetchall()
+            # Return both column names and rows
+            return rows, column_names
+        except exc.SQLAlchemyError as e:
+            print(f"Error executing SELECT query: {e}")
+            return [], []
+        finally:
+            session.close()

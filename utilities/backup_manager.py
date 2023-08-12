@@ -15,7 +15,8 @@ class BackupManager:
 
     def add_record(self, record):
         # Directly append the record to the backup DataFrame
-        self.backup_df = self.backup_df.append(record, ignore_index=True)
+        new_record_df = pd.DataFrame([record])
+        self.backup_df = pd.concat([self.backup_df, new_record_df], ignore_index=True)
 
     def save_to_file(self):
         self.backup_df.to_excel(self.backup_file_path, index=False, engine='openpyxl')
