@@ -17,6 +17,7 @@ class APIRequest:
                 raise ValueError("Unsupported method")
             
             response.raise_for_status()
+
             return response.json()
         except requests.RequestException as e:
             raise Exception(f"Error occurred: {e}")

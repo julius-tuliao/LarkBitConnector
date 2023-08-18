@@ -20,7 +20,7 @@ class BitableManager(APIRequest):
     @retry.retry(tries=3, delay=10, backoff=2)
     def add_rows_to_bitable_batch(self, table_id, records_batch):
         access_token = self._get_user_access_token()
-        url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records/batch_create"
+        url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records/batch_create?user_id_type=user_id"
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {access_token}'
@@ -31,12 +31,13 @@ class BitableManager(APIRequest):
     @retry.retry(tries=3, delay=10, backoff=2)
     def add_rows_to_bitable(self, table_id, row):
         access_token = self._get_user_access_token()
-        url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records"
+        url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records?user_id_type=user_id"
         headers = {
             'Authorization': 'Bearer ' + access_token,
             'Content-Type': 'application/json'
         }
         payload = {"fields": row}
+        print(payload)
         return self.send_request('POST', url, headers, payload)
 
     @retry.retry(tries=3, delay=10, backoff=2)
@@ -56,12 +57,23 @@ class BitableManager(APIRequest):
             if page_token:
                 url += f"&page_token={page_token}"
             response = self.send_request('GET', url, headers)
-            # has_more = response["data"]["has_more"]
-            has_more = False
+            has_more = response["data"]["has_more"]
+            # has_more = False
             page_token = response["data"]["page_token"] if has_more else None
             records.extend(response["data"]["items"])
 
         return records
+    
+    @retry.retry(tries=3, delay=10, backoff=2)
+    def update_rows_to_bitable_batch(self, table_id, records_batch):
+        url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records/batch_update"
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self._get_user_access_token()}'
+        }
+        payload = {'records': [{'fields': record['fields'], 'record_id': record['record_id']} for record in records_batch]}
+    
+        return self.send_request('POST', url, headers, payload)
 
     @retry.retry(tries=3, delay=10, backoff=2)
     def update_rows_in_bitable(self, table_id, record_id, updated_fields):
