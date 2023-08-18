@@ -130,24 +130,6 @@ class FieldReleasedClass:
 
             fields = {
                 "Ref Code": row['leads_ref'],
-                "Case Code": row['leads_ch_code'],
-                "Dl Type": row['leads_dl_type'],
-                "Address Type": row['leads_dl_add_type'],
-                "Address": row['leads_address'],
-                "Bank": row['bank'],
-                "CH Name": row['ch_name'],
-                "Account Number": row['account_number'],
-                "Engine Number": row['engine_number'],
-                "Chassis Number": row['chassis_number'],
-                "Area": row['area'],
-                "Description": row['description'],
-                "Uploaded By": row['uploader_username'],
-                "Agent Name": row['agent_name'],
-                "Agent Code": row["agent_username"],
-                # "Fieldman": row["Field Name"],
-                "Agent Lark": [{"id": tag} for tag in row['Agent Lark']] if row['Agent Lark'] else None,
-                "OIC": [{"id": row['oic'][0]}] if isinstance(row['oic'], Sequence) and len(row['oic']) > 0 else None,
-                "Fieldman Lark": [{"id": row['field_lark'][0]}] if isinstance(row['field_lark'], Sequence) and len(row['field_lark']) > 0 else None,
                 "DL Request Date": dl_date
             }
 
