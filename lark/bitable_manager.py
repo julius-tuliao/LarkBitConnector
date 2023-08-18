@@ -4,7 +4,7 @@ from .lark_authenticator import LarkAuthenticator
 from datetime import datetime
 from utilities.retry_decorator  import Decorator
 from dotenv import load_dotenv,find_dotenv
-
+import time
 
 # Find .env file
 load_dotenv(find_dotenv())
@@ -48,22 +48,29 @@ class BitableManager(APIRequest):
         records = []
         headers = {'Authorization': 'Bearer ' + access_token}
 
+       
         while has_more:
-            base_url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records"
-            filter_str = f"&filter={filter}" if filter else ""
-            
-            url = f"{base_url}?page_size={page_size}{filter_str}"
-            
-            if page_token:
-                url += f"&page_token={page_token}"
-            response = self.send_request('GET', url, headers)
-            has_more = response["data"]["has_more"]
-            # has_more = False
-            page_token = response["data"]["page_token"] if has_more else None
-            records.extend(response["data"]["items"])
+            try:
+                base_url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records"
+                filter_str = f"&filter={filter}" if filter else ""
+                
+                url = f"{base_url}?page_size={page_size}{filter_str}"
+                
+                if page_token:
+                    url += f"&page_token={page_token}"
+                response = self.send_request('GET', url, headers)
+                has_more = response["data"]["has_more"]
+                # has_more = False
+                page_token = response["data"]["page_token"] if has_more else None
+                records.extend(response["data"]["items"])
+                time.sleep(5)
+
+            except Exception as e:
+                print("retry")
 
         return records
-    
+        
+
     @retry.retry(tries=3, delay=10, backoff=2)
     def update_rows_to_bitable_batch(self, table_id, records_batch):
         url = f"{os.getenv('BITABLE_BASE_URL')}/{self.bitable_id}/tables/{table_id}/records/batch_update"
