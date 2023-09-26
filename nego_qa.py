@@ -13,11 +13,11 @@ from PIL.ExifTags import TAGS
 import numpy as np
 from collections.abc import Sequence
 import openai
-
+import wave
 
 from lark.lark_authenticator import LarkAuthenticator
 from lark.lark_contact_manager import LarkContactManager
-from lark.bitable_manager import BitableManager
+from lark.bitable_manager_bot import BitableManager
 from db.mysql_database import Database
 from utilities.download_manager import DownloadManager
 from utilities.file_manager import FileManager
@@ -65,8 +65,6 @@ Did the agent follow the hierarchy of negotiation?
 Did the agent explain the urgency of payment and consequences of Non-payment?
 Was the agent able to obtain a Promise To Pay (PTP) within 3 days?
 Did the agent probe for other contact numbers?
-Did the agent escalate the call to the Team Leader (TL) as needed?
-Did the agent effect or escalate to MCC, whichever is applicable, all necessary action points for the account in compliance with Standard Operating Procedures (SOP)?
 D. NEGATIVE CONTACT
 
 Did the agent probe for other contact details?
@@ -96,7 +94,7 @@ Add also the total count of "N":  Ex: 5
         field_map = {
             'Code': 'Id',
             'Record': 'Attachment',
-            'Record Id': ['Record Id', 'text']
+            'Record Id': ['Record Id', 'text'] 
         }
 
         
@@ -148,6 +146,9 @@ Add also the total count of "N":  Ex: 5
         )
         return response['choices'][0]['message']['content']
 
+    def create_recordings_folder(self):
+        if not os.path.exists('recordings'):
+            os.makedirs('recordings')
 
 
     def main(self):
@@ -155,12 +156,11 @@ Add also the total count of "N":  Ex: 5
         filtered_df = self.get_filtered_df()
 
         # Create the 'recordings' folder if it doesn't exist
-        if not os.path.exists('recordings'):
-            os.makedirs('recordings')
+        self.create_recordings_folder
 
                   
         backup_manager = BackupManager()
-        user_access_token = self.lark_auth.refresh_user_access_token()
+        tenant_access_token = self.lark_auth.get_tenant_access_token()
 
 
         # Download the files first
@@ -172,7 +172,7 @@ Add also the total count of "N":  Ex: 5
             
             link = nego[0]["url"]
             file_name = nego[0]["name"]
-            headers = {'Authorization': 'Bearer ' + user_access_token}
+            headers = {'Authorization': 'Bearer ' + tenant_access_token}
             downloaded_link = requests.get(link, headers=headers)
             downloaded_links.append(downloaded_link)
 
@@ -186,14 +186,26 @@ Add also the total count of "N":  Ex: 5
 
         # Process all MP3 files in the 'recordings' folder
         folder_path = 'recordings'
-        os.chdir(folder_path)
         mp3_files = glob.glob('*.mp3')
         
         for record, mp3_file in filtered_records:
             
             print(record["Record Id"])
+            
+            # file_path = f"{folder_path}/{os.path.splitext(mp3_file)[0]}.mp3" 
+            # with wave.open(file_path, 'rb') as wav_file:
+            #     frames = wav_file.getnframes()
+            #     rate = wav_file.getframerate()
+
+            # duration_seconds = frames / float(rate)
+
+            # Convert duration to minutes and seconds
+            # minutes = int(duration_seconds // 60)
+            # seconds = int(duration_seconds % 60)
+            # call_duration = f"{minutes} minutes and {seconds} seconds"
+
             # Step 1: Transcribe the audio using the Whisper API
-            corrected_text = self.transcribe(mp3_file)
+            corrected_text = self.transcribe('recordings/' + mp3_file)
 
             # Save the transcribed audio to a text file
             transcript_filename = f"transcript_{os.path.splitext(mp3_file)[0]}.txt"
